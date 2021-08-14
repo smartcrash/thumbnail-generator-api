@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 /** GET home page. */
 app.get('/', (_, res) => res.render('index', {}))
+app.use('/generator', require('./routes/generator'))
 
 /** Catch 404 and forward to error handler */
 app.use((_, __, next) => next(createError(404)))
