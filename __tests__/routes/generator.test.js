@@ -83,9 +83,15 @@ describe('GET /:id/:size?', () => {
       .expect(200)
       .expect('Content-Type', /json/)
 
-    const { id } = response.body
+    const { id, thumbnails } = response.body
 
-    return request(app).get(`/${id}`).expect(200).expect('Content-Type', /image/)
+    await request(app).get(`/${id}`).expect(200).expect('Content-Type', /image/)
+
+    await Promise.all(
+      thumbnails
+        .map(url => new URL(url).pathname)
+        .map(pathname => request(app).get(pathname).expect(200).expect('Content-Type', /image/))
+    )
   })
 
   describe('accepts `size` optional paramenter to return the image in the following dimensions: 400x300, 160x120, 120x120', () => {
