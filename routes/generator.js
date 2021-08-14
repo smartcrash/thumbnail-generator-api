@@ -22,8 +22,7 @@ router.post('/', upload.single('image'), function (req, res, next) {
 
   if (!validateMimeType(mimetype)) {
     res.status(400).json({
-      status: 400,
-      error: 'BadRequest',
+      error: true,
       message: `Invalid file extension. Allowed extensions: PNG, JPG, JPEG`,
     })
     return
@@ -31,8 +30,7 @@ router.post('/', upload.single('image'), function (req, res, next) {
 
   if (sizeInMB > 5) {
     res.status(400).json({
-      status: 400,
-      error: 'BadRequest',
+      error: true,
       message: 'The image is too large. Max size 5MB',
     })
     return
