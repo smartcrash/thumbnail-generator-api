@@ -9,7 +9,7 @@
   - [+] **400x300(\*)**
   - [+] 160x120
   - [+] 120x120
-- [ ] It includes **Swagger** documentation
+- [*] It includes **Swagger** documentation
 - [ ] It includes configuration files / scripts for deploying it on **AWS**
 - [ ] It’s serverless! (**AWS Lambda + API Gateway**)
 - [ ] It relies on **Serverless Framework**

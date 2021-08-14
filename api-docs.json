@@ -1,0 +1,114 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Thumbnail Generator API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/{id}/{size}": {
+      "get": {
+        "summary": "Get thumbnail by ID",
+        "description": "",
+        "produces": [
+          "image/jpeg"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "400x300",
+              "160x120",
+              "120x120"
+            ],
+            "default": "400x300"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The image in the requested dimention"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/": {
+      "post": {
+        "summary": "Generates a thumbnails from a source image",
+        "description": "",
+        "operationId": "createThumbnails",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "image",
+            "description": "The source image",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "This is the ID of the created image. This is used to request the thumbnails"
+                },
+                "thumbnails": {
+                  "type": "array",
+                  "description": "A list containing the URL to request the thumbnails",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true,
+                  "maxItems": 3,
+                  "minItems": 3
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid image",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {},
+  "tags": []
+}

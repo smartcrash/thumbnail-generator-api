@@ -27,10 +27,29 @@ const createThumbnails = (buffer, sizes) => {
 }
 
 /**
- * @openapi
- * /:
+ * @swagger
+ * /{id}/{size}:
  *   get:
- *     description: Returns a previously generated thumbnail by `id` and `size`
+ *     summary: Get thumbnail by ID
+ *     description: ''
+ *     produces:
+ *       - image/jpeg
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: size
+ *         in: path
+ *         required: true
+ *         type: string
+ *         enum: [400x300, 160x120, 120x120]
+ *         default: 400x300
+ *     responses:
+ *       200:
+ *         description: The image in the requested dimention
+ *       404:
+ *          description: Not Found
  */
 router.get('/:id/:size?', (req, res) => {
   const { id, size = '400x300' } = req.params
@@ -39,13 +58,50 @@ router.get('/:id/:size?', (req, res) => {
 })
 
 /**
- * @openapi
+ * @swagger
  * /:
  *   post:
- *     description: Generates a thumbnail from a source image
+ *     summary: 'Generates a thumbnails from a source image'
+ *     description: ''
+ *     operationId: 'createThumbnails'
+ *     consumes:
+ *       - 'multipart/form-data'
+ *     produces:
+ *       - 'application/json'
+ *     parameters:
+ *       - in: 'formData'
+ *         name: 'image'
+ *         description: 'The source image'
+ *         type: 'file'
+ *         required: true
  *     responses:
- *       200:
- *         description: Returns converted image in varioures dimentions
+ *       '200':
+ *         description: 'Successful operation'
+ *         schema:
+ *           type: 'object'
+ *           properties:
+ *             success:
+ *               type: 'boolean'
+ *             id:
+ *               type: 'string'
+ *               description: 'This is the ID of the created image. This is used to request the thumbnails'
+ *             thumbnails:
+ *               type: 'array'
+ *               description: 'A list containing the URL to request the thumbnails'
+ *               items:
+ *                 type: 'string'
+ *               uniqueItems: true
+ *               maxItems: 3
+ *               minItems: 3
+ *       '405':
+ *         description: 'Invalid image'
+ *         schema:
+ *           type: 'object'
+ *           properties:
+ *             error:
+ *               type: 'boolean'
+ *             message:
+ *               type: 'string'
  */
 router.post('/', upload.single('image'), async (req, res, next) => {
   const { file } = req
@@ -53,7 +109,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
   const sizeInMB = sizeInBytes / (1024 * 1024)
 
   if (!validateMimeType(mimetype)) {
-    res.status(400).json({
+    res.status(405).json({
       error: true,
       message: `Invalid file extension. Allowed extensions: PNG, JPG, JPEG`,
     })
@@ -61,7 +117,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
   }
 
   if (sizeInMB > 5) {
-    res.status(400).json({
+    res.status(405).json({
       error: true,
       message: 'The image is too large. Max size 5MB',
     })
