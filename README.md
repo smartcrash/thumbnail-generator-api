@@ -9,11 +9,11 @@
   - [+] **400x300(\*)**
   - [+] 160x120
   - [+] 120x120
-- [*] It includes **Swagger** documentation
+- [+] It includes **Swagger** documentation
 - [ ] It includes configuration files / scripts for deploying it on **AWS**
 - [ ] It’s serverless! (**AWS Lambda + API Gateway**)
 - [ ] It relies on **Serverless Framework**
-- [*] It’s Dockerized for local development / testing
+- [+] It’s Dockerized for local development / testing
 - [ ] It leverages cloud services (ie: AWS S3, SNS, SQS, etc…)
 - [ ] It’s asynchronic
 - [ ] It’s fast (<~500ms after upload finishes)
@@ -21,5 +21,8 @@
 - [ ] It has an auth implementation using Auth0
 - [ ] It includes a configuration file / script to setup a CI/CD process on AWS
 - [ ] It includes three different kinds of tests (unit, integration and performance)
+  - [ ] Unit
+  - [+] Integration
+  - [ ] Performance
 
 ## Most of the requirements are optional except for those marked with (\*)
