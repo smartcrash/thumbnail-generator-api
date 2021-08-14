@@ -29,10 +29,25 @@ describe('POST /generator', () => {
           expect(res.body).toEqual({
             status: 400,
             error: 'BadRequest',
-            message: 'Invalid file extension',
+            message: `Invalid file extension. Allowed extensions: PNG, JPG, JPEG`,
           })
         )
         .end(done)
     })
+  })
+
+  it('must reject input file bigger than 5mb', done => {
+    createRequest()
+      .attach('image', resolve('__tests__/routes/files/a-very-large-file.png'))
+      .expect(400)
+      .expect('Content-Type', /json/)
+      .expect(res =>
+        expect(res.body).toEqual({
+          status: 400,
+          error: 'BadRequest',
+          message: 'The image is too large. Max size 5MB',
+        })
+      )
+      .end(done)
   })
 })

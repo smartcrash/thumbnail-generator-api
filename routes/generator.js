@@ -17,16 +17,23 @@ const validateMimeType = (mimetype = '') => allowMimeTypes.includes(mimetype)
  */
 router.post('/', upload.single('image'), function (req, res, next) {
   const { file } = req
-  const { mimetype } = file
+  const { mimetype, size: sizeInBytes } = file
+  const sizeInMB = sizeInBytes / (1024 * 1024)
 
-  // If `file` is falsy means that all files were filtered out
-  // by the `fileFilter` function, meaning that no valid file
-  // was uploaded
   if (!validateMimeType(mimetype)) {
     res.status(400).json({
       status: 400,
       error: 'BadRequest',
-      message: 'Invalid file extension',
+      message: `Invalid file extension. Allowed extensions: PNG, JPG, JPEG`,
+    })
+    return
+  }
+
+  if (sizeInMB > 5) {
+    res.status(400).json({
+      status: 400,
+      error: 'BadRequest',
+      message: 'The image is too large. Max size 5MB',
     })
     return
   }
