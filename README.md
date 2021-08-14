@@ -13,7 +13,7 @@
 - [ ] It includes configuration files / scripts for deploying it on **AWS**
 - [ ] It’s serverless! (**AWS Lambda + API Gateway**)
 - [ ] It relies on **Serverless Framework**
-- [ ] It’s Dockerized for local development / testing
+- [*] It’s Dockerized for local development / testing
 - [ ] It leverages cloud services (ie: AWS S3, SNS, SQS, etc…)
 - [ ] It’s asynchronic
 - [ ] It’s fast (<~500ms after upload finishes)
