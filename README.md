@@ -15,9 +15,9 @@
 - [ ] It relies on **Serverless Framework**
 - [+] It’s Dockerized for local development / testing
 - [ ] It leverages cloud services (ie: AWS S3, SNS, SQS, etc…)
-- [ ] It’s asynchronic
-- [ ] It’s fast (<~500ms after upload finishes)
-- [*] It includes testing with at least 70% coverage
+- [+] It’s asynchronic
+- [+] It’s fast (<~500ms after upload finishes)
+- [+] It includes testing with at least 70% coverage
 - [ ] It has an auth implementation using Auth0
 - [ ] It includes a configuration file / script to setup a CI/CD process on AWS
 - [ ] It includes three different kinds of tests (unit, integration and performance)
