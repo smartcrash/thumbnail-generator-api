@@ -143,7 +143,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       writeFile(`${directory}/120x120.jpeg`, buffers[2]),
     ])
 
-    const thumbnails = [`${url}/thumbnails/${id}/400x300`, `${url}/${id}/160x120`, `${url}/${id}/120x120`]
+    const thumbnails = [`${url}/${id}/400x300`, `${url}/${id}/160x120`, `${url}/${id}/120x120`]
 
     res.status(200).json({
       success: true,
