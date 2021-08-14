@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const storage = multer.memoryStorage()
 const upload = multer({ dest: 'uploads/', storage })
-const { v4: uuidv4 } = require('uuid')
+const { v4: uuid } = require('uuid')
 const { writeFile, mkdir } = require('fs').promises
 const { resolve } = require('path')
 const sharp = require('sharp')
@@ -28,7 +28,19 @@ const createThumbnails = (buffer, sizes) => {
 
 /**
  * @openapi
- * /generator:
+ * /:
+ *   get:
+ *     description: Returns a previously generated thumbnail by `id` and `size`
+ */
+router.get('/:id/:size?', (req, res) => {
+  const { id, size = '400x300' } = req.params
+
+  res.sendFile(resolve(`public/thumbnails/${id}/${size}.jpeg`))
+})
+
+/**
+ * @openapi
+ * /:
  *   post:
  *     description: Generates a thumbnail from a source image
  *     responses:
@@ -63,7 +75,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       [120, 120],
     ]
 
-    const id = uuidv4()
+    const id = uuid()
     const url = fullURL(req)
     const buffers = await createThumbnails(fileBuffer, dimentions)
 
@@ -75,7 +87,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       writeFile(`${directory}/120x120.jpeg`, buffers[2]),
     ])
 
-    const thumbnails = [`${url}/${id}/400x300`, `${url}/${id}/160x120`, `${url}/${id}/120x120`]
+    const thumbnails = [`${url}/thumbnails/${id}/400x300`, `${url}/${id}/160x120`, `${url}/${id}/120x120`]
 
     res.status(200).json({
       success: true,

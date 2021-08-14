@@ -2,3 +2,4 @@ node_modules
 uploads
 storage
 public/thumbnails
+tmp

@@ -1,15 +1,14 @@
 const request = require('supertest')
 const app = require('../../app')
 const { resolve } = require('path')
-
-const createRequest = () => request(app).post('/generator')
+const { v4: uuid } = require('uuid')
+const imageSize = require('image-size')
+const { createWriteStream, statSync, rmdir, mkdir, mkdirSync } = require('fs')
 
 const getFile = fileName => resolve(`__tests__/routes/files/${fileName}`)
 
 const assertSuccessResponse = res => {
   const { success, id, thumbnails } = res.body
-
-  console.log(`res.body`, res.body)
 
   expect(success).toBe(true)
   expect(typeof id).toBe('string')
@@ -34,18 +33,19 @@ const assertErrorResponse = (res, expectedMessage) => {
   })
 }
 
-describe('POST /generator', () => {
+describe('POST /', () => {
   describe('only accepts PNG and JPEG files', () => {
     it('allows PNG files', done => {
-      createRequest().attach('image', getFile('a-png.png')).expect(200).end(done)
+      request(app).post('/').attach('image', getFile('a-png.png')).expect(200).end(done)
     })
 
     it('allows JPG/JPEG files', done => {
-      createRequest().attach('image', getFile('a-jpg.jpg')).expect(200).end(done)
+      request(app).post('/').attach('image', getFile('a-jpg.jpg')).expect(200).end(done)
     })
 
     it('does not allow any other file type', done => {
-      createRequest()
+      request(app)
+        .post('/')
         .attach('image', getFile('a-pdf.pdf'))
         .expect(400)
         .expect('Content-Type', /json/)
@@ -55,7 +55,8 @@ describe('POST /generator', () => {
   })
 
   it('must reject input file bigger than 5mb', done => {
-    createRequest()
+    request(app)
+      .post('/')
       .attach('image', getFile('a-very-large-file.png'))
       .expect(400)
       .expect('Content-Type', /json/)
@@ -64,11 +65,67 @@ describe('POST /generator', () => {
   })
 
   it('gives 3 new images with the following dimensions: 400x300, 160x120, 120x120', done => {
-    createRequest()
+    request(app)
+      .post('/')
       .attach('image', getFile('a-png.png'))
       .expect(200)
       .expect('Content-Type', /json/)
       .expect(assertSuccessResponse)
       .end(done)
+  })
+})
+
+describe('GET /:id/:size?', () => {
+  it('returns previously generated thumbnails by ID', async () => {
+    const response = await request(app)
+      .post('/')
+      .attach('image', getFile('a-jpg.jpg'))
+      .expect(200)
+      .expect('Content-Type', /json/)
+
+    const { id } = response.body
+
+    return request(app).get(`/${id}`).expect(200).expect('Content-Type', /image/)
+  })
+
+  describe('accepts `size` optional paramenter to return the image in the following dimensions: 400x300, 160x120, 120x120', () => {
+    const tmpdir = resolve('tmp/')
+    let id
+
+    beforeAll(done => {
+      mkdirSync(tmpdir, { recursive: true })
+
+      request(app)
+        .post('/')
+        .attach('image', getFile('a-jpg.jpg'))
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => (id = res.body.id))
+        .end(done)
+    })
+
+    afterAll(done => rmdir(tmpdir, { recursive: true, force: true }, done))
+    ;[
+      [400, 300],
+      [160, 120],
+      [120, 120],
+    ].forEach(size => {
+      it(size.join('x'), done => {
+        const fileName = `${tmpdir}/${uuid()}.jpeg`
+        const writeStream = createWriteStream(fileName)
+
+        request(app)
+          .get(`/${id}/${size.join('x')}`)
+          .expect(200)
+          .expect('Content-Type', /image/)
+          .pipe(writeStream, { end: true })
+
+        writeStream.on('finish', () => {
+          const { width, height } = imageSize(fileName)
+          expect([width, height]).toEqual(size)
+          done()
+        })
+      })
+    })
   })
 })
